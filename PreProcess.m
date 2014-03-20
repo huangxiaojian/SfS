@@ -4,8 +4,14 @@ function [  ] = PreProcess(  )
 
 ImageData = imread('face.png');
 MaskImage = imread('maskImage.png');
-RefHeightMat = load('height.hm');
+RefHeightMat = load('newHeight.hm');
 [imageWidth, imageHeight] = size(RefHeightMat);
+% imageWidth = 60*4;
+% imageHeight = 60*4;
+% ball_radius = 28*4;
+% ball_posX = 30*4;
+% ball_posY = 30*4;
+
 RefImage = zeros(imageWidth, imageHeight);
 RefNormalizedNormalsV = zeros(1, imageWidth*imageHeight*3);
 RefNormalPQV = zeros(1, imageWidth*imageHeight*2); %internal
@@ -14,22 +20,21 @@ RefMaskImage = zeros(imageWidth, imageHeight);
 MatXYToIndex = zeros(imageWidth, imageHeight);
 MatXYToBoundary = zeros(imageWidth, imageHeight);
 
+
 % mask mapping
 maskCount = 0;
 for i = 1:imageWidth
     for j = 1:imageHeight
-        if MaskImage(i, j, 1) > 100
+        if MaskImage(i, j, 1) > 100         
             maskCount = maskCount+1;
             MatXYToIndex(i,j) = maskCount;
             IndexToMatX(maskCount) = i;
             IndexToMatY(maskCount) = j;
             RefMaskImage(i,j) = 1;
-            %RefImage(imageWidth+1-i,j) = 1;
             r = 0.2989*double(ImageData(i,j,1));
             g = 0.5870*double(ImageData(i,j,2));
             b = 0.1140*double(ImageData(i,j,3));
             intensity = (r+g+b)/256;
-            %RefImage(imageWidth+1-i,j) = intensity;
             RefImage(i,j) = intensity;
         else
             RefMaskImage(i,j) = 0;
@@ -53,18 +58,14 @@ for i = 1:imageWidth
     end
 end
 
-% DebugImage = zeros(imageWidth, imageHeight);
 % internal normal
 for k = 1:maskCount
     i = IndexToMatX(k);
     j = IndexToMatY(k);
     if RefMaskImage(i,j) < 1.5 %internal
-        % DebugImage(i,j) = 1;
         baseIndex = (i-1)*imageHeight+j-1;
         RefNormalPQV(baseIndex*2+1) = RefHeightMat(i+1, j) - RefHeightMat(i, j);
         RefNormalPQV(baseIndex*2+2) = RefHeightMat(i, j+1) - RefHeightMat(i, j);
-        
-        % DebugImage(i,j) = RefNormalPQV(baseIndex*2+1);
         
         normal = [-RefNormalPQV(baseIndex*2+1), -RefNormalPQV(baseIndex*2+2), 1];
         normal = normal/norm(normal);
@@ -98,9 +99,9 @@ for k = 1:boundaryCount
         fprintf('fuck(%d,%d)\n', i, j);
         LRidxX = [i-2,i-2,i-2,i-2,i-2,i-1,i-1,i,i,i+1,i+1,i+2,i+2,i+2,i+2,i+2];
         LRidxY = [j-2,j-1,j,j+1,j+2,j-2,j+2,j-2,j+2,j-2,j+2,j-2,j-1,j,j+1,j+2];
-        for ln = 1:16
-            lx = LRidxX(ln);
-            ly = LRidxY(ln);
+        for n = 1:16
+            x = LRidxX(n);
+            y = LRidxY(n);
             if RefMaskImage(x,y) > 0.5 && RefMaskImage(x,y) < 1.5 %internal
                 count = count + 1;
                 normal(1) = normal(1) + RefNormalizedNormalsV(((x-1)*imageHeight+y-1)*3+1);
@@ -119,13 +120,21 @@ for k = 1:boundaryCount
     RefNormalizedNormalsV(((i-1)*imageHeight+j-1)*3+3) = normal(3);
 end
 
+save MatXYToIndex.mat MatXYToIndex;
+save MatXYToBoundary.mat MatXYToBoundary;
+save IndexToMatXV.mat IndexToMatX;
+save IndexToMatYV.mat IndexToMatY;
+save BoundaryIndexXV.mat BoundaryIndexX;
+save BoundaryIndexYV.mat BoundaryIndexY;
+
 save RefImage.mat RefImage;
 save RefMaskImage.mat RefMaskImage;
 save RefNormalizedNormalsV.mat RefNormalizedNormalsV;
 save RefNormalPQV.mat RefNormalPQV;
 save RefHeightMat.mat RefHeightMat;
 
-%imshow(RefImage);
+% imshow(RefImage);
+
 RefLightDir = [0, 0, 1];
 RefNormalizedLightDir = RefLightDir/norm(RefLightDir);
 albedo = 0.8;
@@ -136,6 +145,7 @@ for i = 1:imageWidth
     end
 end
 
+save ComputedImage.mat ComputedImage;
 imshow(ComputedImage);
 
 end

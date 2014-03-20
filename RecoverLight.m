@@ -2,14 +2,10 @@ function [ ] = RecoverLight( )
 %RECOVERLIGHT Summary of this function goes here
 %   Detailed explanation goes here
 
-%I = imread('RefIntensity.jpg');
-%MaskImage = imread('MaskImage.jpg');
-
 albedo = 0.8;
 I = importdata('RefImage.mat'); %input data
 MaskImage = importdata('RefMaskImage.mat'); %input data
 Nref = importdata('RefNormalizedNormalsV.mat'); %input data
-%Nref = RefNormalizedNormalsV;
 [imageWidth, imageHeight] = size(I);
 
 length = 4;
@@ -74,17 +70,6 @@ end
 
 imshow(ComputedImage);
 save ComputedImage.mat ComputedImage;
-
-% deltaImage = zeros(image_width, image_height);
-% for i = 1:image_width
-%    for j = 1:image_height
-%        if(maskImage(i,j) > 0.5)
-%            deltaImage(i, j) = image(i, j) - computedImage(i, j);
-%        end
-%    end
-% end
-% 
-% imshow(deltaImage);
 
 end
 

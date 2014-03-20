@@ -183,7 +183,7 @@ for i = 2:imageWidth-1
             end
             
             btmp = RefZ(i, j);
-            scale = 1 / scale;
+            scale = 1;% / scale;
             for k = 1:9
                 if(MaskImage(step2IndexArrayX(k), step2IndexArrayY(k)) > 0.5)
                     indexCount = indexCount + 1;

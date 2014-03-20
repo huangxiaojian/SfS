@@ -6,11 +6,6 @@ ImageData = imread('face.png');
 MaskImage = imread('maskImage.png');
 RefHeightMat = load('newHeight.hm');
 [imageWidth, imageHeight] = size(RefHeightMat);
-% imageWidth = 60*4;
-% imageHeight = 60*4;
-% ball_radius = 28*4;
-% ball_posX = 30*4;
-% ball_posY = 30*4;
 
 RefImage = zeros(imageWidth, imageHeight);
 RefNormalizedNormalsV = zeros(1, imageWidth*imageHeight*3);
